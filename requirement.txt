@@ -6,3 +6,5 @@ pyarrow
 fastparquet
 tqdm
 scikit-learn
+seaborn
+streamlit

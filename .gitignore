@@ -1,3 +1,5 @@
 *.csv
 *.parquet
 *.json
+Data/Output/conceptnet_trained_20250522_170059.pkl
+Data/Output/conceptnet_graph.graphml

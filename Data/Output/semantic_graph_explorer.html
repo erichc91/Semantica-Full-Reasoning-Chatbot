@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semantic Graph Explorer</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        .controls {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        input[type="text"] {
+            padding: 12px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 25px;
+            width: 300px;
+            margin-right: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+        }
+        button {
+            padding: 12px 25px;
+            font-size: 16px;
+            border: none;
+            border-radius: 25px;
+            background: #ff6b6b;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            background: #ff5252;
+            transform: translateY(-2px);
+        }
+        #graph {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            margin: 20px auto;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+        .node {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .node:hover {
+            stroke-width: 3px;
+        }
+        .node-label {
+            font-family: 'Segoe UI', sans-serif;
+            font-weight: bold;
+            text-anchor: middle;
+            pointer-events: none;
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+        }
+        .link {
+            stroke: #999;
+            stroke-opacity: 0.6;
+            stroke-width: 2px;
+        }
+        .center-node {
+            stroke: #ff6b6b;
+            stroke-width: 4px;
+        }
+        .info-panel {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+        }
+        .suggestions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .suggestion-btn {
+            padding: 8px 15px;
+            font-size: 14px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .suggestion-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧠 Semantic Graph Explorer</h1>
+        
+        <div class="controls">
+            <input type="text" id="conceptInput" placeholder="Enter a concept to explore..." value="money">
+            <button onclick="exploreStatic()">Explore Network</button>
+            <button onclick="startRandomWalk()">Random Walk</button>
+        </div>
+        
+        <svg id="graph" width="800" height="600"></svg>
+        
+        <div class="info-panel">
+            <div id="infoText">Enter a concept above to explore its semantic neighborhood</div>
+            <div class="suggestions">
+                <span>Try these concepts:</span>
+                <div class="suggestion-btn" onclick="exploreConcept('construction')">construction</div>
+                <div class="suggestion-btn" onclick="exploreConcept('money')">money</div>
+                <div class="suggestion-btn" onclick="exploreConcept('work')">work</div>
+                <div class="suggestion-btn" onclick="exploreConcept('time')">time</div>
+                <div class="suggestion-btn" onclick="exploreConcept('human')">human</div>
+                <div class="suggestion-btn" onclick="exploreConcept('love')">love</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Real graph data loaded from your GraphML file
+        let realGraph = null;
+        
+        // Load the graph data from a JSON file (we'll create this from your GraphML)
+        async function loadGraphData() {
+            try {
+                const response = await fetch('graph_data.json');
+                const data = await response.json();
+                realGraph = data;
+                console.log(`Graph loaded: ${Object.keys(realGraph).length} nodes`);
+                document.getElementById('infoText').innerHTML = `
+                    <strong>🎉 Real graph loaded!</strong><br>
+                    ${Object.keys(realGraph).length} nodes available<br>
+                    Enter any concept to explore its connections
+                `;
+            } catch (error) {
+                console.error('Failed to load graph data:', error);
+                document.getElementById('infoText').innerHTML = `
+                    <strong>⚠️ Could not load graph data</strong><br>
+                    Make sure graph_data.json is in the same directory<br>
+                    Run the Python script below to generate it from your GraphML file
+                `;
+            }
+        }
+        
+        // Call this when page loads
+        loadGraphData();
+
+        const svg = d3.select("#graph");
+        const width = 800;
+        const height = 600;
+        
+        let simulation;
+        let currentConcept = 'money';
+
+        function exploreStatic() {
+            const concept = document.getElementById('conceptInput').value.toLowerCase().trim();
+            if (concept) {
+                exploreConcept(concept);
+            }
+        }
+
+        function exploreConcept(concept) {
+            currentConcept = concept;
+            document.getElementById('conceptInput').value = concept;
+            
+            if (!realGraph || !realGraph[concept]) {
+                document.getElementById('infoText').innerHTML = `
+                    <strong>Concept "${concept}" not found</strong><br>
+                    ${realGraph ? `Try one of ${Object.keys(realGraph).length} available concepts` : 'Graph data not loaded yet'}<br>
+                    <em>Search is case-sensitive, try lowercase</em>
+                `;
+                return;
+            }
+
+            const data = realGraph[concept];
+            visualizeNetwork(concept, data.neighbors, data.connections);
+            
+            document.getElementById('infoText').innerHTML = `
+                <strong>Exploring: "${concept}"</strong><br>
+                Direct connections: ${data.connections}<br>
+                Showing top ${data.neighbors.length} most connected neighbors<br>
+                <em>Click any node to explore its neighborhood</em>
+            `;
+        }
+
+        function visualizeNetwork(centerConcept, neighbors, totalConnections) {
+            svg.selectAll("*").remove();
+
+            const nodes = [
+                {id: centerConcept, type: 'center', x: width/2, y: height/2},
+                ...neighbors.map((neighbor, i) => ({
+                    id: neighbor, 
+                    type: 'neighbor',
+                    x: width/2 + 200 * Math.cos(2 * Math.PI * i / neighbors.length),
+                    y: height/2 + 200 * Math.sin(2 * Math.PI * i / neighbors.length)
+                }))
+            ];
+
+            const links = neighbors.map(neighbor => ({
+                source: centerConcept,
+                target: neighbor,
+                strength: Math.random() * 0.5 + 0.5
+            }));
+
+            // Create force simulation
+            simulation = d3.forceSimulation(nodes)
+                .force("link", d3.forceLink(links).id(d => d.id).distance(100))
+                .force("charge", d3.forceManyBody().strength(-300))
+                .force("center", d3.forceCenter(width / 2, height / 2))
+                .force("collision", d3.forceCollide().radius(30));
+
+            // Draw links
+            const link = svg.append("g")
+                .selectAll("line")
+                .data(links)
+                .enter().append("line")
+                .attr("class", "link")
+                .style("stroke-width", d => Math.sqrt(d.strength * 5));
+
+            // Draw nodes
+            const node = svg.append("g")
+                .selectAll("circle")
+                .data(nodes)
+                .enter().append("circle")
+                .attr("class", d => d.type === 'center' ? "node center-node" : "node")
+                .attr("r", d => d.type === 'center' ? 25 : 18)
+                .attr("fill", d => d.type === 'center' ? "#ff6b6b" : "#4ecdc4")
+                .call(d3.drag()
+                    .on("start", dragstarted)
+                    .on("drag", dragged)
+                    .on("end", dragended))
+                .on("click", function(event, d) {
+                    if (d.type === 'neighbor') {
+                        exploreConcept(d.id);
+                    }
+                });
+
+            // Add labels
+            const label = svg.append("g")
+                .selectAll("text")
+                .data(nodes)
+                .enter().append("text")
+                .attr("class", "node-label")
+                .style("font-size", d => d.type === 'center' ? "14px" : "12px")
+                .style("fill", "#333")
+                .text(d => d.id);
+
+            // Update positions on simulation tick
+            simulation.on("tick", () => {
+                link
+                    .attr("x1", d => d.source.x)
+                    .attr("y1", d => d.source.y)
+                    .attr("x2", d => d.target.x)
+                    .attr("y2", d => d.target.y);
+
+                node
+                    .attr("cx", d => Math.max(30, Math.min(width - 30, d.x)))
+                    .attr("cy", d => Math.max(30, Math.min(height - 30, d.y)));
+
+                label
+                    .attr("x", d => Math.max(30, Math.min(width - 30, d.x)))
+                    .attr("y", d => Math.max(30, Math.min(height - 30, d.y)) + 5);
+            });
+        }
+
+        function startRandomWalk() {
+            if (!realGraph) {
+                document.getElementById('infoText').innerHTML = "<strong>Graph data not loaded yet!</strong>";
+                return;
+            }
+            
+            let walkConcepts = Object.keys(realGraph);
+            // Shuffle and take first 10 for demo
+            walkConcepts = walkConcepts.sort(() => 0.5 - Math.random()).slice(0, 10);
+            let currentIndex = 0;
+            
+            const walkInterval = setInterval(() => {
+                if (currentIndex >= walkConcepts.length) {
+                    clearInterval(walkInterval);
+                    document.getElementById('infoText').innerHTML += "<br><strong>Random walk complete!</strong>";
+                    return;
+                }
+                
+                exploreConcept(walkConcepts[currentIndex]);
+                currentIndex++;
+            }, 2000);
+            
+            document.getElementById('infoText').innerHTML = "<strong>Starting random walk through concepts...</strong>";
+        }
+
+        function dragstarted(event, d) {
+            if (!event.active) simulation.alphaTarget(0.3).restart();
+            d.fx = d.x;
+            d.fy = d.y;
+        }
+
+        function dragged(event, d) {
+            d.fx = event.x;
+            d.fy = event.y;
+        }
+
+        function dragended(event, d) {
+            if (!event.active) simulation.alphaTarget(0);
+            d.fx = null;
+            d.fy = null;
+        }
+
+        // Handle enter key
+        document.getElementById('conceptInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                exploreStatic();
+            }
+        });
+
+        // Initialize with money
+        exploreConcept('money');
+    </script>
+</body>
+</html>
