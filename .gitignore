@@ -6,3 +6,4 @@ Data/Output/conceptnet_graph.graphml
 *.graphml
 *.pkl
 *.pkl
+*.png
