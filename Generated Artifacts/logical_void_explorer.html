@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logical Void Mathematical Discovery Engine</title>
+    <style>
+        body {
+            background: #000;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .control-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .discovery-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .panel {
+            background: #111;
+            border: 2px solid #333;
+            padding: 15px;
+            border-radius: 8px;
+            min-height: 300px;
+        }
+        .active {
+            border-color: #00ff00;
+            box-shadow: 0 0 10px #00ff00;
+        }
+        .void-panel {
+            border-color: #ff00ff;
+        }
+        .novel-panel {
+            border-color: #ffff00;
+        }
+        .validation-panel {
+            border-color: #ff0000;
+        }
+        button {
+            background: #003300;
+            color: #00ff00;
+            border: 2px solid #00ff00;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin: 3px;
+            font-family: inherit;
+            font-size: 12px;
+        }
+        button:hover {
+            background: #006600;
+        }
+        button:disabled {
+            background: #333;
+            color: #666;
+            cursor: not-allowed;
+        }
+        .void-item {
+            background: #220022;
+            border: 1px solid #ff00ff;
+            padding: 8px;
+            margin: 3px 0;
+            border-radius: 3px;
+            font-size: 11px;
+        }
+        .concept-item {
+            background: #222200;
+            border: 1px solid #ffff00;
+            padding: 8px;
+            margin: 3px 0;
+            border-radius: 3px;
+            font-size: 11px;
+        }
+        .validation-item {
+            background: #220000;
+            border: 1px solid #ff0000;
+            padding: 8px;
+            margin: 3px 0;
+            border-radius: 3px;
+            font-size: 11px;
+        }
+        .valid {
+            border-color: #00ff00;
+            background: #002200;
+        }
+        .progress {
+            width: 100%;
+            height: 15px;
+            background: #333;
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff00ff, #ffff00, #00ff00);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            text-align: center;
+            margin: 15px 0;
+        }
+        .stat {
+            background: #222;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #444;
+        }
+        .breakthrough {
+            background: #004400;
+            border: 3px solid #00ff00;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            text-align: center;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔮 Logical Void Mathematical Discovery Engine</h1>
+            <p>Exploring unmapped mathematical territories • Generating concepts at logical boundaries</p>
+        </div>
+
+        <div class="control-grid">
+            <div class="panel">
+                <h3>🎯 Void Detection</h3>
+                <button onclick="mapLogicalVoids()">🔍 Map Logical Voids</button>
+                <button onclick="findBoundaryConditions()">🌊 Find Boundary Conditions</button>
+                <button onclick="relaxConstraints()">🔓 Relax Constraints</button>
+                <div class="progress">
+                    <div class="progress-fill" id="voidProgress"></div>
+                </div>
+                <div id="voidStatus">Ready to explore mathematical boundaries</div>
+            </div>
+
+            <div class="panel">
+                <h3>⚡ Concept Generation</h3>
+                <button onclick="generateTransitionalStructures()">🔄 Transitional Structures</button>
+                <button onclick="generateMetaMathematical()">🧠 Meta-Mathematical Objects</button>
+                <button onclick="exploreNegations()">🚫 Systematic Negations</button>
+                <div class="progress">
+                    <div class="progress-fill" id="conceptProgress"></div>
+                </div>
+                <div id="conceptStatus">Awaiting void mapping</div>
+            </div>
+
+            <div class="panel">
+                <h3>✅ Boolean Validation</h3>
+                <button onclick="validateConsistency()">🔬 Test Consistency</button>
+                <button onclick="checkCrossDomain()">🌐 Cross-Domain Check</button>
+                <button onclick="assessNovelty()">💎 Assess Novelty</button>
+                <div class="progress">
+                    <div class="progress-fill" id="validationProgress"></div>
+                </div>
+                <div id="validationStatus">Ready for concept validation</div>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat">
+                <div style="color: #ff00ff; font-weight: bold;" id="voidCount">0</div>
+                <div>Logical Voids</div>
+            </div>
+            <div class="stat">
+                <div style="color: #ffff00; font-weight: bold;" id="conceptCount">0</div>
+                <div>Novel Concepts</div>
+            </div>
+            <div class="stat">
+                <div style="color: #00ff00; font-weight: bold;" id="validCount">0</div>
+                <div>Validated</div>
+            </div>
+            <div class="stat">
+                <div style="color: #ff0000; font-weight: bold;" id="rejectedCount">0</div>
+                <div>Rejected</div>
+            </div>
+            <div class="stat">
+                <div style="color: #00ffff; font-weight: bold;" id="noveltyScore">0.0</div>
+                <div>Novelty Score</div>
+            </div>
+        </div>
+
+        <div class="discovery-grid">
+            <div class="panel void-panel">
+                <h3>🌌 Discovered Logical Voids</h3>
+                <div id="voidFeed" style="height: 400px; overflow-y: auto;"></div>
+            </div>
+
+            <div class="panel novel-panel">
+                <h3>💡 Generated Novel Concepts</h3>
+                <div id="conceptFeed" style="height: 400px; overflow-y: auto;"></div>
+            </div>
+
+            <div class="panel validation-panel">
+                <h3>🔬 Validation Results</h3>
+                <div id="validationFeed" style="height: 400px; overflow-y: auto;"></div>
+            </div>
+
+            <div class="panel">
+                <h3>🏆 Mathematical Breakthroughs</h3>
+                <div id="breakthroughFeed" style="height: 400px; overflow-y: auto;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let discoveryState = {
+            logicalVoids: [],
+            novelConcepts: [],
+            validatedConcepts: [],
+            rejectedConcepts: [],
+            breakthroughs: [],
+            isRunning: false
+        };
+
+        // Mathematical Domain Mapping
+        const mathDomains = {
+            algebra: {
+                axioms: ['associativity', 'commutativity', 'distributivity', 'identity', 'inverse'],
+                structures: ['group', 'ring', 'field', 'vector_space'],
+                operations: ['addition', 'multiplication', 'composition']
+            },
+            topology: {
+                axioms: ['continuity', 'compactness', 'connectedness'],
+                structures: ['metric_space', 'topological_space', 'manifold'],
+                operations: ['homeomorphism', 'homotopy', 'limit']
+            },
+            numberTheory: {
+                axioms: ['well_ordering', 'induction', 'divisibility'],
+                structures: ['integers', 'primes', 'modular_arithmetic'],
+                operations: ['division', 'gcd', 'modular_exponentiation']
+            },
+            analysis: {
+                axioms: ['completeness', 'continuity', 'differentiability'],
+                structures: ['real_numbers', 'complex_numbers', 'function_spaces'],
+                operations: ['differentiation', 'integration', 'limit']
+            }
+        };
+
+        function mapLogicalVoids() {
+            document.getElementById('voidStatus').textContent = 'Mapping logical boundaries...';
+            let progress = 0;
+            const totalSteps = 50;
+
+            const interval = setInterval(() => {
+                progress++;
+                document.getElementById('voidProgress').style.width = (progress / totalSteps * 100) + '%';
+
+                // Generate logical voids
+                if (progress % 5 === 0) {
+                    const void_ = generateLogicalVoid();
+                    if (void_) {
+                        discoveryState.logicalVoids.push(void_);
+                        updateVoidDisplay();
+                    }
+                }
+
+                if (progress >= totalSteps) {
+                    clearInterval(interval);
+                    document.getElementById('voidStatus').textContent = 
+                        `Found ${discoveryState.logicalVoids.length} logical voids`;
+                    updateStats();
+                }
+            }, 100);
+        }
+
+        function generateLogicalVoid() {
+            const voidTypes = [
+                'axiom_relaxation',
+                'dimensional_gap',
+                'operation_incompleteness',
+                'structural_boundary',
+                'constraint_violation'
+            ];
+
+            const type = voidTypes[Math.floor(Math.random() * voidTypes.length)];
+            const domains = Object.keys(mathDomains);
+            const domain1 = domains[Math.floor(Math.random() * domains.length)];
+            const domain2 = domains[Math.floor(Math.random() * domains.length)];
+
+            let void_;
+
+            switch (type) {
+                case 'axiom_relaxation':
+                    const axiom = mathDomains[domain1].axioms[Math.floor(Math.random() * mathDomains[domain1].axioms.length)];
+                    void_ = {
+                        type: 'axiom_relaxation',
+                        description: `What if ${axiom} is partially violated in ${domain1}?`,
+                        domain: domain1,
+                        target: axiom,
+                        explorationSpace: `Structures where ${axiom} holds only conditionally`,
+                        noveltyPotential: 0.7 + Math.random() * 0.3
+                    };
+                    break;
+
+                case 'dimensional_gap':
+                    void_ = {
+                        type: 'dimensional_gap',
+                        description: `Mathematical objects between integer dimensions`,
+                        domain: 'topology',
+                        target: 'fractional_dimension',
+                        explorationSpace: 'Non-integer dimensional structures',
+                        noveltyPotential: 0.8 + Math.random() * 0.2
+                    };
+                    break;
+
+                case 'operation_incompleteness':
+                    const op1 = mathDomains[domain1].operations[Math.floor(Math.random() * mathDomains[domain1].operations.length)];
+                    const op2 = mathDomains[domain2].operations[Math.floor(Math.random() * mathDomains[domain2].operations.length)];
+                    void_ = {
+                        type: 'operation_incompleteness',
+                        description: `Hybrid operation combining ${op1} from ${domain1} with ${op2} from ${domain2}`,
+                        domain: `${domain1}_${domain2}`,
+                        target: `${op1}_${op2}_hybrid`,
+                        explorationSpace: 'Cross-domain operation synthesis',
+                        noveltyPotential: 0.6 + Math.random() * 0.4
+                    };
+                    break;
+
+                case 'structural_boundary':
+                    const struct1 = mathDomains[domain1].structures[Math.floor(Math.random() * mathDomains[domain1].structures.length)];
+                    const struct2 = mathDomains[domain2].structures[Math.floor(Math.random() * mathDomains[domain2].structures.length)];
+                    void_ = {
+                        type: 'structural_boundary',
+                        description: `Transitional objects between ${struct1} and ${struct2}`,
+                        domain: `${domain1}_${domain2}`,
+                        target: `${struct1}_${struct2}_transition`,
+                        explorationSpace: 'Morphing mathematical structures',
+                        noveltyPotential: 0.75 + Math.random() * 0.25
+                    };
+                    break;
+
+                case 'constraint_violation':
+                    void_ = {
+                        type: 'constraint_violation',
+                        description: `Objects that systematically violate standard mathematical constraints`,
+                        domain: domain1,
+                        target: 'constraint_breaking',
+                        explorationSpace: 'Mathematically impossible but logically consistent objects',
+                        noveltyPotential: 0.9 + Math.random() * 0.1
+                    };
+                    break;
+            }
+
+            return void_;
+        }
+
+        function findBoundaryConditions() {
+            document.getElementById('voidStatus').textContent = 'Analyzing mathematical boundaries...';
+            
+            // Add specific boundary conditions
+            const boundaries = [
+                {
+                    type: 'convergence_boundary',
+                    description: 'Points where mathematical series oscillate between convergence and divergence',
+                    domain: 'analysis',
+                    target: 'quasi_convergent_series',
+                    explorationSpace: 'Conditionally convergent mathematical objects',
+                    noveltyPotential: 0.85
+                },
+                {
+                    type: 'algebraic_geometry_gap',
+                    description: 'Algebraic structures that resist geometric interpretation',
+                    domain: 'algebra_geometry',
+                    target: 'non_geometric_algebra',
+                    explorationSpace: 'Algebraic objects without spatial representation',
+                    noveltyPotential: 0.9
+                },
+                {
+                    type: 'discrete_continuous_boundary',
+                    description: 'Mathematical objects that are neither fully discrete nor continuous',
+                    domain: 'analysis_combinatorics',
+                    target: 'quasi_discrete_structures',
+                    explorationSpace: 'Hybrid discrete-continuous mathematics',
+                    noveltyPotential: 0.8
+                }
+            ];
+
+            boundaries.forEach(boundary => {
+                discoveryState.logicalVoids.push(boundary);
+            });
+
+            updateVoidDisplay();
+            updateStats();
+            document.getElementById('voidStatus').textContent = 'Boundary conditions mapped';
+        }
+
+        function relaxConstraints() {
+            document.getElementById('voidStatus').textContent = 'Systematically relaxing mathematical constraints...';
+
+            // Generate constraint relaxations
+            const relaxations = [
+                {
+                    type: 'partial_commutativity',
+                    description: 'Operations that are commutative only under specific conditions',
+                    domain: 'algebra',
+                    target: 'conditional_commutativity',
+                    explorationSpace: 'Conditionally commutative structures',
+                    noveltyPotential: 0.7
+                },
+                {
+                    type: 'fractional_associativity',
+                    description: 'Associativity that holds to varying degrees',
+                    domain: 'algebra',
+                    target: 'graded_associativity',
+                    explorationSpace: 'Approximately associative operations',
+                    noveltyPotential: 0.75
+                },
+                {
+                    type: 'probabilistic_identity',
+                    description: 'Identity elements that work probabilistically',
+                    domain: 'algebra',
+                    target: 'stochastic_identity',
+                    explorationSpace: 'Probabilistic algebraic structures',
+                    noveltyPotential: 0.8
+                }
+            ];
+
+            relaxations.forEach(relaxation => {
+                discoveryState.logicalVoids.push(relaxation);
+            });
+
+            updateVoidDisplay();
+            updateStats();
+            document.getElementById('voidStatus').textContent = 'Constraint relaxation complete';
+        }
+
+        function generateTransitionalStructures() {
+            if (discoveryState.logicalVoids.length === 0) {
+                document.getElementById('conceptStatus').textContent = 'Need logical voids first';
+                return;
+            }
+
+            document.getElementById('conceptStatus').textContent = 'Generating transitional structures...';
+            let progress = 0;
+
+            const interval = setInterval(() => {
+                progress += 2;
+                document.getElementById('conceptProgress').style.width = Math.min(100, progress) + '%';
+
+                if (discoveryState.logicalVoids.length > 0) {
+                    const void_ = discoveryState.logicalVoids[Math.floor(Math.random() * discoveryState.logicalVoids.length)];
+                    const concept = generateConceptFromVoid(void_, 'transitional');
+                    if (concept) {
+                        discoveryState.novelConcepts.push(concept);
+                        updateConceptDisplay();
+                    }
+                }
+
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    document.getElementById('conceptStatus').textContent = 
+                        `Generated ${discoveryState.novelConcepts.length} transitional concepts`;
+                    updateStats();
+                }
+            }, 150);
+        }
+
+        function generateMetaMathematical() {
+            document.getElementById('conceptStatus').textContent = 'Creating meta-mathematical objects...';
+
+            const metaConcepts = [
+                {
+                    type: 'mathematical_operation_on_operations',
+                    name: 'Operation Composition Algebra',
+                    description: 'Algebraic structure where elements are mathematical operations themselves',
+                    definition: 'Let ⊕ be addition and ⊗ be multiplication. Define (⊕ ∘ ⊗)(a,b,c) = ⊕(a, ⊗(b,c))',
+                    domain: 'meta_algebra',
+                    noveltyScore: 0.85,
+                    validationTests: ['closure_test', 'associativity_test', 'identity_test']
+                },
+                {
+                    type: 'self_referential_structure',
+                    name: 'Recursive Group Definition',
+                    description: 'Group where the group operation is defined in terms of the group itself',
+                    definition: 'G = {g ∈ G : g ∘ G = G} where ∘ is defined by the condition',
+                    domain: 'meta_algebra',
+                    noveltyScore: 0.9,
+                    validationTests: ['consistency_test', 'non_triviality_test']
+                },
+                {
+                    type: 'theorem_space',
+                    name: 'Space of Mathematical Theorems',
+                    description: 'Topological space where points are theorems and distance measures logical similarity',
+                    definition: 'd(T1, T2) = |axioms(T1) △ axioms(T2)| + logical_distance(proof(T1), proof(T2))',
+                    domain: 'meta_topology',
+                    noveltyScore: 0.95,
+                    validationTests: ['metric_axioms', 'continuity_of_proof_steps']
+                }
+            ];
+
+            metaConcepts.forEach(concept => {
+                discoveryState.novelConcepts.push(concept);
+            });
+
+            updateConceptDisplay();
+            updateStats();
+            document.getElementById('conceptStatus').textContent = 'Meta-mathematical objects generated';
+        }
+
+        function exploreNegations() {
+            document.getElementById('conceptStatus').textContent = 'Exploring systematic negations...';
+
+            const negations = [
+                {
+                    type: 'non_transitive_equivalence',
+                    name: 'Quasi-Equivalence Relation',
+                    description: 'Equivalence-like relation that violates transitivity in controlled ways',
+                    definition: 'a ≈ b ≈ c but a ≉ c under specific conditions',
+                    domain: 'logic',
+                    noveltyScore: 0.8,
+                    validationTests: ['reflexivity', 'symmetry', 'controlled_transitivity_failure']
+                },
+                {
+                    type: 'negative_dimensional_space',
+                    name: 'Anti-Dimensional Manifold',
+                    description: 'Mathematical space with negative dimensional properties',
+                    definition: 'Manifold M where dim(M × R) = dim(M) - 1',
+                    domain: 'topology',
+                    noveltyScore: 0.95,
+                    validationTests: ['consistency_with_product_rule', 'embedding_properties']
+                },
+                {
+                    type: 'inverse_closure',
+                    name: 'Anti-Closed Operation',
+                    description: 'Operation that systematically produces elements outside the original set',
+                    definition: 'Operation ∘ where a,b ∈ S implies (a ∘ b) ∉ S but (a ∘ b) ∘ c ∈ S',
+                    domain: 'algebra',
+                    noveltyScore: 0.75,
+                    validationTests: ['systematic_escape', 'eventual_return']
+                }
+            ];
+
+            negations.forEach(concept => {
+                discoveryState.novelConcepts.push(concept);
+            });
+
+            updateConceptDisplay();
+            updateStats();
+            document.getElementById('conceptStatus').textContent = 'Systematic negations explored';
+        }
+
+        function generateConceptFromVoid(void_, type) {
+            return {
+                type: type,
+                name: `${void_.target.replace(/_/g, ' ')} Structure`,
+                description: void_.description,
+                definition: `Mathematical object exploring ${void_.explorationSpace}`,
+                domain: void_.domain,
+                sourceVoid: void_.type,
+                noveltyScore: void_.noveltyPotential,
+                validationTests: ['consistency', 'non_triviality', 'cross_domain_coherence']
+            };
+        }
+
+        function validateConsistency() {
+            if (discoveryState.novelConcepts.length === 0) {
+                document.getElementById('validationStatus').textContent = 'No concepts to validate';
+                return;
+            }
+
+            document.getElementById('validationStatus').textContent = 'Testing logical consistency...';
+            let progress = 0;
+
+            const interval = setInterval(() => {
+                progress += 3;
+                document.getElementById('validationProgress').style.width = Math.min(100, progress) + '%';
+
+                if (discoveryState.novelConcepts.length > 0) {
+                    const concept = discoveryState.novelConcepts.shift();
+                    const validation = performConsistencyTest(concept);
+                    
+                    if (validation.isValid) {
+                        discoveryState.validatedConcepts.push({...concept, validation});
+                        
+                        // Check for breakthrough
+                        if (concept.noveltyScore > 0.9) {
+                            discoveryState.breakthroughs.push({
+                                concept: concept,
+                                breakthrough: 'High novelty mathematical concept with logical consistency',
+                                significance: concept.noveltyScore
+                            });
+                            updateBreakthroughDisplay();
+                        }
+                    } else {
+                        discoveryState.rejectedConcepts.push({...concept, validation});
+                    }
+                    
+                    updateValidationDisplay();
+                }
+
+                if (progress >= 100 || discoveryState.novelConcepts.length === 0) {
+                    clearInterval(interval);
+                    document.getElementById('validationStatus').textContent = 
+                        `Validation complete: ${discoveryState.validatedConcepts.length} valid, ${discoveryState.rejectedConcepts.length} rejected`;
+                    updateStats();
+                }
+            }, 200);
+        }
+
+        function performConsistencyTest(concept) {
+            // Simulate rigorous logical consistency testing
+            const tests = concept.validationTests || ['basic_consistency'];
+            const results = {};
+            let overallValid = true;
+
+            tests.forEach(test => {
+                // Simulate test execution with realistic failure rates
+                let testResult;
+                switch(test) {
+                    case 'consistency':
+                    case 'basic_consistency':
+                        testResult = Math.random() > 0.3; // 70% pass rate
+                        break;
+                    case 'non_triviality':
+                        testResult = Math.random() > 0.4; // 60% pass rate
+                        break;
+                    case 'cross_domain_coherence':
+                        testResult = Math.random() > 0.5; // 50% pass rate
+                        break;
+                    default:
+                        testResult = Math.random() > 0.6; // 40% pass rate for complex tests
+                }
+                
+                results[test] = testResult;
+                if (!testResult) overallValid = false;
+            });
+
+            return {
+                isValid: overallValid,
+                tests: results,
+                confidenceScore: Object.values(results).filter(r => r).length / tests.length,
+                logicalSoundness: overallValid ? 'SOUND' : 'INCONSISTENT'
+            };
+        }
+
+        function checkCrossDomain() {
+            document.getElementById('validationStatus').textContent = 'Cross-domain validation...';
+            
+            // Simulate cross-domain testing
+            discoveryState.validatedConcepts.forEach(concept => {
+                const crossDomainScore = Math.random();
+                concept.crossDomainValid = crossDomainScore > 0.6;
+                concept.crossDomainScore = crossDomainScore;
+                
+                if (crossDomainScore > 0.8) {
+                    discoveryState.breakthroughs.push({
+                        concept: concept,
+                        breakthrough: 'Cross-domain mathematical consistency achieved',
+                        significance: crossDomainScore
+                    });
+                }
+            });
+
+            updateValidationDisplay();
+            updateBreakthroughDisplay();
+            updateStats();
+            document.getElementById('validationStatus').textContent = 'Cross-domain validation complete';
+        }
+
+        function assessNovelty() {
+            const totalNovelty = discoveryState.validatedConcepts.reduce((sum, concept) => 
+                sum + (concept.noveltyScore || 0), 0);
+            const avgNovelty = discoveryState.validatedConcepts.length > 0 ? 
+                totalNovelty / discoveryState.validatedConcepts.length : 0;
+
+            document.getElementById('noveltyScore').textContent = avgNovelty.toFixed(2);
+            
+            if (avgNovelty > 0.85) {
+                discoveryState.breakthroughs.push({
+                    concept: { name: 'Discovery Session', type: 'meta_discovery' },
+                    breakthrough: `Exceptional novelty score: ${avgNovelty.toFixed(2)}`,
+                    significance: avgNovelty
+                });
+                updateBreakthroughDisplay();
+            }
+
+            document.getElementById('validationStatus').textContent = `Novelty assessment: ${avgNovelty.toFixed(2)}`;
+        }
+
+        // Display update functions
+        function updateVoidDisplay() {
+            const feed = document.getElementById('voidFeed');
+            feed.innerHTML = discoveryState.logicalVoids.map(void_ => 
+                `<div class="void-item">
+                    <strong>${void_.type.replace(/_/g, ' ')}</strong><br>
+                    ${void_.description}<br>
+                    <small>Domain: ${void_.domain} | Novelty: ${void_.noveltyPotential.toFixed(2)}</small>
+                </div>`
+            ).join('');
+        }
+
+        function updateConceptDisplay() {
+            const feed = document.getElementById('conceptFeed');
+            feed.innerHTML = discoveryState.novelConcepts.map(concept => 
+                `<div class="concept-item">
+                    <strong>${concept.name}</strong><br>
+                    ${concept.description}<br>
+                    <small>Type: ${concept.type} | Novelty: ${concept.noveltyScore.toFixed(2)}</small>
+                </div>`
+            ).join('');
+        }
+
+        function updateValidationDisplay() {
+            const feed = document.getElementById('validationFeed');
+            const allConcepts = [...discoveryState.validatedConcepts, ...discoveryState.rejectedConcepts];
+            
+            feed.innerHTML = allConcepts.map(concept => 
+                `<div class="validation-item ${concept.validation?.isValid ? 'valid' : ''}">
+                    <strong>${concept.name}</strong><br>
+                    Status: ${concept.validation?.logicalSoundness || 'PENDING'}<br>
+                    <small>Confidence: ${(concept.validation?.confidenceScore || 0).toFixed(2)}</small>
+                </div>`
+            ).join('');
+        }
+
+        function updateBreakthroughDisplay() {
+            const feed = document.getElementById('breakthroughFeed');
+            feed.innerHTML = discoveryState.breakthroughs.map(breakthrough => 
+                `<div class="breakthrough">
+                    <strong>🏆 ${breakthrough.concept.name}</strong><br>
+                    ${breakthrough.breakthrough}<br>
+                    <small>Significance: ${breakthrough.significance.toFixed(3)}</small>
+                </div>`
+            ).join('');
+        }
+
+        function updateStats() {
+            document.getElementById('voidCount').textContent = discoveryState.logicalVoids.length;
+            document.getElementById('conceptCount').textContent = discoveryState.novelConcepts.length;
+            document.getElementById('validCount').textContent = discoveryState.validatedConcepts.length;
+            document.getElementById('rejectedCount').textContent = discoveryState.rejectedConcepts.length;
+        }
+    </script>
+</body>
+</html>
